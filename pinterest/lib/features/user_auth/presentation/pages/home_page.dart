@@ -10,21 +10,21 @@ import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:flutter_firebase/screens/images_details_screen.dart';
 import 'package:flutter_firebase/widget/api_call_waiting_widget.dart';
 import 'package:shimmer/shimmer.dart';
-import '../api/pexel_api_class.dart';
-import '../model/pexel_model.dart';
+import 'package:flutter_firebase/api/pexel_api_class.dart';
+import 'package:flutter_firebase/model/pexel_model.dart';
 
-import '../themes/container_random_colors.dart';
-import '../widget/loading_Widget.dart';
-import 'onboard_screen.dart';
+import 'package:flutter_firebase/themes/container_random_colors.dart';
+import 'package:flutter_firebase/widget/loading_Widget.dart';
+import 'package:flutter_firebase/screens/onboard_screen.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomePageState extends State<HomePage> {
   int currentIndex = 1;
   ScrollController scrollController = ScrollController();
   bool isStarted = false;
@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isRefreshing = false;
 
   final GlobalKey<LiquidPullToRefreshState> _refreshIndicatorKey =
-      GlobalKey<LiquidPullToRefreshState>();
+  GlobalKey<LiquidPullToRefreshState>();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       List<Photo> newCuratedPhotos =
-          await pexelsApi.getCuratedPhotos(page: 1, perPage: 15);
+      await pexelsApi.getCuratedPhotos(page: 1, perPage: 15);
 
       setState(() {
         curatedPhotos = newCuratedPhotos;
@@ -218,19 +218,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   Center(
                       child: AnimatedTextKit(
-                    animatedTexts: quotes.map((quote) {
-                      return TypewriterAnimatedText(
-                        quote,
-                        textStyle: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        speed: const Duration(milliseconds: 100),
-                        textAlign: TextAlign.center,
-                      );
-                    }).toList(),
-                  )),
+                        animatedTexts: quotes.map((quote) {
+                          return TypewriterAnimatedText(
+                            quote,
+                            textStyle: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            speed: const Duration(milliseconds: 100),
+                            textAlign: TextAlign.center,
+                          );
+                        }).toList(),
+                      )),
                 ]),
               ),
             ];
@@ -263,12 +263,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               onTap: () {
                                 Navigator.of(context).push(PageRouteBuilder(
                                   pageBuilder: (context, animation,
-                                          secondaryAnimation) =>
+                                      secondaryAnimation) =>
                                       ImageDetailsScreen(
-                                    photo: photo,
-                                    curatedPhotos: curatedPhotos,
-                                    initialIndex: index,
-                                  ),
+                                        photo: photo,
+                                        curatedPhotos: curatedPhotos,
+                                        initialIndex: index,
+                                      ),
                                   transitionsBuilder: (context, animation,
                                       secondaryAnimation, child) {
                                     const begin = Offset(0.0, 1.0);
@@ -278,14 +278,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                     var tween = Tween(begin: begin, end: end)
                                         .chain(CurveTween(curve: curve));
                                     var offsetAnimation =
-                                        animation.drive(tween);
+                                    animation.drive(tween);
 
                                     return SlideTransition(
                                         position: offsetAnimation,
                                         child: child);
                                   },
                                   transitionDuration:
-                                      const Duration(milliseconds: 500),
+                                  const Duration(milliseconds: 500),
                                 ));
                               },
                               child: Column(
@@ -306,17 +306,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                       child: (photo.url != null)
                                           ? null
                                           : const Center(
-                                              child: Icon(
-                                                Icons.image_not_supported,
-                                                size: 50,
-                                                color: Colors.white,
-                                              ),
-                                            ),
+                                        child: Icon(
+                                          Icons.image_not_supported,
+                                          size: 50,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                     children: [
                                       Flexible(
                                         child: Text(
@@ -344,8 +344,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               ));
                         },
                         gridDelegate:
-                            const SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2));
+                        const SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2));
                   } else {
                     return YourLoadingWidget(
                       child: Container(),

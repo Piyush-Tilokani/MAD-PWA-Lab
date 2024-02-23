@@ -1,64 +1,59 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart'; 
+import 'package:flutter_firebase/features/app/splash_screen/splash_screen.dart';
+import 'package:flutter_firebase/features/user_auth/presentation/pages/home_page.dart';
+import 'package:flutter_firebase/features/user_auth/presentation/pages/login_page.dart';
+import 'package:flutter_firebase/features/user_auth/presentation/pages/sign_up_page.dart';
+import 'package:flutter_firebase/screens/bottom_nav_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:pinterest_clone/screens/bottom_nav_bar.dart';
-import 'package:pinterest_clone/screens/home_screen.dart';
-import 'package:pinterest_clone/screens/login_page.dart';
-import 'package:pinterest_clone/screens/onboard_screen.dart';
-import 'package:pinterest_clone/screens/splash_screen.dart';
 
-
-void main() {
-  runApp(const MyApp());
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: FirebaseOptions(
+        apiKey: "AIzaSyCsHDQtI9DItQgSqwy45_y2xG9tDGxuER8",
+        appId: "1:540215271818:web:8b22d4aee01acdce862873",
+        messagingSenderId: "540215271818",
+        projectId: "flutter-firebase-9c136",
+        // Your web Firebase config options
+      ),
+    );
+  } else {
+    await Firebase.initializeApp();
+  }
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(375, 810),
-      builder: (context, child){
-        return MaterialApp(
-          title: 'Pinterest',
-          debugShowCheckedModeBanner: false,
-          onGenerateRoute: (settings) {
-            if (settings.name == AppRoutes.splashScreen) {
-              return MaterialPageRoute(
-                builder: (context) {
-                  return const SplashScreen();
-                },
-              );
-            }
-            if (settings.name == AppRoutes.homeScreenRoute) {
-              return MaterialPageRoute(builder: (context) {
-                return const HomeScreen();
-              });
-            }
-            if (settings.name == AppRoutes.bottomNavBar) {
-              return MaterialPageRoute(builder: (context) {
-                return const BottomNavBarScreen();
-              });
-            }
-            if (settings.name == AppRoutes.onboardScreen) {
-              return MaterialPageRoute(builder: (context) {
-                return const OnboardingScreen();
-              });
-            }
-            if (settings.name == AppRoutes.loginPage) {
-              return MaterialPageRoute(builder: (context) {
-                return LoginPage(); // Replace with your LoginPage class
-              });
-            }
-
-          },
-          initialRoute: AppRoutes.loginPage,
-        );
-      },
+        designSize: const Size(375, 810),
+    builder: (context, child) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Firebase',
+        routes: {
+          '/': (context) =>
+              SplashScreen(
+                // Here, you can decide whether to show the LoginPage or HomePage based on user authentication
+                child: LoginPage(),
+              ),
+          '/login': (context) => LoginPage(),
+          '/signUp': (context) => SignUpPage(),
+          '/home': (context) => HomePage(),
+          '/navigation': (context) => BottomNavBarScreen(),
+        },
+      );
+    },
 
     );
   }
 }
+
 
 class AppRoutes {
   static const String splashScreen = '/splash_screen';

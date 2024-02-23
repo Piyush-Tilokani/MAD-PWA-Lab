@@ -1,14 +1,18 @@
+// import 'dart:html';
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pinterest_clone/api/pexel_api_class.dart';
-import 'package:pinterest_clone/model/pexel_model.dart';
-import 'package:pinterest_clone/themes/container_random_colors.dart';
-import 'package:pinterest_clone/widget/api_call_waiting_widget.dart';
+import 'package:flutter_firebase/api/pexel_api_class.dart';
+import 'package:flutter_firebase/model/pexel_model.dart';
+import 'package:flutter_firebase/themes/container_random_colors.dart';
+import 'package:flutter_firebase/widget/api_call_waiting_widget.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../model/comment_model.dart';
 import '../widget/loading_Widget.dart';
 import 'image_full_Screen_mode.dart';
@@ -111,30 +115,40 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
     );
   }
 
-  // void downloadImage(String imageUrl) async {
-  //   try {
-  //     final status = await Permission.storage.request();
-  //     if (status == PermissionStatus.granted) {
-  //       final directory = await getExternalStorageDirectory();
-  //       final savedDir = directory?.path ?? "your_default_directory";
-  //
-  //       final taskId = await FlutterDownloader.enqueue(
-  //         url: imageUrl,
-  //         savedDir: savedDir,
-  //         showNotification: true,
-  //         openFileFromNotification: true,
-  //       );
-  //     } else {
-  //       if (kDebugMode) {
-  //         print("Permission denied");
-  //       }
-  //     }
-  //   } catch (error) {
-  //     if (kDebugMode) {
-  //       print('Download error: $error');
-  //     }
-  //   }
-  // }
+  void downloadImage(String imageUrl) async {
+    try {
+      // Request storage permission
+      final status = await await Permission.storage.status;
+      if (status == PermissionStatus.granted) {
+        // Get external storage directory
+        final directory = await getExternalStorageDirectory();
+        final savedDir = directory?.path ?? "your_default_directory";
+
+        // Enqueue download task
+        final taskId = await FlutterDownloader.enqueue(
+          url: imageUrl,
+          savedDir: savedDir,
+          showNotification: true,
+          openFileFromNotification: true,
+        );
+
+        // Optionally, listen to download progress or completion
+        FlutterDownloader.registerCallback((id, status, progress) {
+          // Handle download progress or completion
+        });
+      }
+      if (status == PermissionStatus.permanentlyDenied) {
+        openAppSettings();
+      } else {
+        // Handle permission denied
+        await Permission.storage.request();
+        print("Permission denied");
+      }
+    } catch (error) {
+      // Handle download error
+      print('Download error: $error');
+    }
+  }
 
   void addComment(String text) {
     setState(() {
@@ -309,14 +323,14 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                 ),
               ],
             ),
-             SizedBox(
+            SizedBox(
               height: 5.h,
             ),
             Divider(
               color: Colors.grey.shade500,
               thickness: 0.8,
             ),
-             SizedBox(
+            SizedBox(
               height: 5.h,
             ),
             Padding(
@@ -332,7 +346,7 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                           children: [
                             const CircleAvatar(
                                 radius: 25, child: Icon(CupertinoIcons.person)),
-                             SizedBox(
+                            SizedBox(
                               width: 8.w,
                             ),
                             Text(
@@ -376,7 +390,7 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                       )
                     ],
                   ),
-                   SizedBox(
+                  SizedBox(
                     height: 8.h,
                   ),
                   Text(
@@ -393,14 +407,14 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                 ],
               ),
             ),
-             SizedBox(
+            SizedBox(
               height: 5.h,
             ),
             Divider(
               color: Colors.grey.shade500,
               thickness: 0.8,
             ),
-             SizedBox(
+            SizedBox(
               height: 5.h,
             ),
             Column(
@@ -422,17 +436,13 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                             ),
                           ),
                           title: Text(
-                            comments.isNotEmpty
-                                ? comments.first.username
-                                : '',
+                            comments.isNotEmpty ? comments.first.username : '',
                             style: GoogleFonts.poppins(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600),
                           ),
                           subtitle: Text(
-                            comments.isNotEmpty
-                                ? comments.first.text
-                                : '',
+                            comments.isNotEmpty ? comments.first.text : '',
                             style: GoogleFonts.poppins(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500),
@@ -463,13 +473,12 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                         child: TextField(
                           controller: _commentController,
                           style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500),
+                              color: Colors.white, fontWeight: FontWeight.w500),
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(19),
-                                borderSide: const BorderSide(
-                                    color: Colors.white)),
+                                borderSide:
+                                    const BorderSide(color: Colors.white)),
                             hintText: 'Add a comment...',
                             hintStyle: GoogleFonts.poppins(
                                 color: Colors.grey,
@@ -503,14 +512,14 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                 ),
               ],
             ),
-             SizedBox(
+            SizedBox(
               height: 5.h,
             ),
             Divider(
               color: Colors.grey.shade500,
               thickness: 0.8,
             ),
-             SizedBox(
+            SizedBox(
               height: 5.h,
             ),
             Padding(
@@ -523,15 +532,16 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                     style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
-                        fontSize: 18.sp
-                    ),
+                        fontSize: 18.sp),
                   ),
                   SizedBox(
                     height: MediaQuery.of(context).size.height,
                     child: FutureBuilder<List<Photo>>(
-                      future: pexelsApi.getRelatedPhotos(photo, page: 1, perPage: 50),
+                      future: pexelsApi.getRelatedPhotos(photo,
+                          page: 1, perPage: 50),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return const WaitingContainer();
                         } else if (snapshot.hasError) {
                           return Center(
@@ -546,30 +556,40 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                             itemCount: similarPhotos.length,
                             itemBuilder: (context, index) {
                               final photo = similarPhotos[index];
-                              final double imageAspectRatio = photo.width / photo.height;
+                              final double imageAspectRatio =
+                                  photo.width / photo.height;
                               if (kDebugMode) {
-                                print('Similar Photo URL: ${photo.src["large"]}');
+                                print(
+                                    'Similar Photo URL: ${photo.src["large"]}');
                               }
                               return GestureDetector(
                                 onTap: () {
-                                  Navigator.of(context).push(
-                                      PageRouteBuilder(
-                                        pageBuilder: (context, animation, secondaryAnimation) => ImageDetailsScreen(
-                                          photo: photo, curatedPhotos: similarPhotos, initialIndex: index,
-                                        ),
-                                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                          const begin = Offset(0.0, 1.0);
-                                          const end = Offset.zero;
-                                          const curve = Curves.easeInOut;
+                                  Navigator.of(context).push(PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        ImageDetailsScreen(
+                                      photo: photo,
+                                      curatedPhotos: similarPhotos,
+                                      initialIndex: index,
+                                    ),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      const begin = Offset(0.0, 1.0);
+                                      const end = Offset.zero;
+                                      const curve = Curves.easeInOut;
 
-                                          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-                                          var offsetAnimation = animation.drive(tween);
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+                                      var offsetAnimation =
+                                          animation.drive(tween);
 
-                                          return SlideTransition(position: offsetAnimation, child: child);
-                                        },
-                                        transitionDuration: const Duration(milliseconds: 500),
-                                      )
-                                  );
+                                      return SlideTransition(
+                                          position: offsetAnimation,
+                                          child: child);
+                                    },
+                                    transitionDuration:
+                                        const Duration(milliseconds: 500),
+                                  ));
                                 },
                                 child: Column(
                                   children: [
@@ -578,31 +598,36 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                                       child: Container(
                                         margin: const EdgeInsets.all(5),
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(15),
-                                          color: ColorList.colorList[Random().nextInt(ColorList.colorList.length)],
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          color: ColorList.colorList[Random()
+                                              .nextInt(
+                                                  ColorList.colorList.length)],
                                           image: DecorationImage(
                                             fit: BoxFit.cover,
-                                            image: NetworkImage(photo.src["large"] ?? ''),
+                                            image: NetworkImage(
+                                                photo.src["large"] ?? ''),
                                           ),
                                         ),
                                         child: (photo.url != null)
                                             ? null
                                             : const Center(
-                                          child: Icon(
-                                            Icons.image_not_supported,
-                                            size: 50,
-                                            color: Colors.white,
-                                          ),
-                                        ),
+                                                child: Icon(
+                                                  Icons.image_not_supported,
+                                                  size: 50,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
                                       ),
                                     ),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Flexible(
                                           child: Text(
                                             photo.alt,
-                                            style:  GoogleFonts.poppins(
+                                            style: GoogleFonts.poppins(
                                               fontWeight: FontWeight.w500,
                                               fontSize: 14.sp,
                                               color: Colors.white,
@@ -624,7 +649,8 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                                 ),
                               );
                             },
-                            gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate:
+                                const SliverSimpleGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
                             ),
                           );
@@ -636,7 +662,6 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                       },
                     ),
                   )
-
                 ],
               ),
             ),
@@ -645,7 +670,6 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
       ),
     );
   }
-
 
   Widget _bottomSheetContainer() {
     return Container(
@@ -660,7 +684,7 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           SizedBox(
+          SizedBox(
             height: 10.h,
           ),
           Center(
@@ -672,7 +696,7 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                   color: Colors.white),
             ),
           ),
-           SizedBox(
+          SizedBox(
             height: 10.h,
           ),
           TextButton(
@@ -684,12 +708,12 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                     fontSize: 20.sp,
                     color: Colors.white),
               )),
-           SizedBox(
+          SizedBox(
             height: 5.h,
           ),
           TextButton(
             onPressed: () {
-              // downloadImage(widget.curatedPhotos[_currentIndex].src['large']);
+              downloadImage(widget.curatedPhotos[_currentIndex].src['large']);
             },
             child: Text(
               "Download Image",
@@ -700,7 +724,7 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
               ),
             ),
           ),
-           SizedBox(
+          SizedBox(
             height: 5.h,
           ),
           TextButton(
@@ -729,7 +753,7 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                     "Cancel",
                     style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
-                        fontSize: 18.sp,
+                        fontSize: 16.sp,
                         color: Colors.white),
                   ),
                 ),
@@ -747,8 +771,9 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
       children: [
         GestureDetector(
           child: Container(
-              width: 180.w,
+              width: 173.w,
               height: 56.h,
+              margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
               decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.circular(45),
@@ -821,7 +846,7 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                               ),
                             ],
                           ),
-                           SizedBox(
+                          SizedBox(
                             height: 15.h,
                           ),
                           Row(
@@ -840,7 +865,7 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                                   ),
                                 ),
                               ),
-                               SizedBox(
+                              SizedBox(
                                 width: 10.w,
                               ),
                               Text(
@@ -861,7 +886,7 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
             );
           },
           child: Container(
-              width: 180.w,
+              width: 173.w,
               height: 56.h,
               decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
@@ -888,9 +913,9 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(15),
-            topRight: Radius.circular(15),
-          )),
+        topLeft: Radius.circular(15),
+        topRight: Radius.circular(15),
+      )),
       builder: (context) {
         return Container(
           height: 700.h,
@@ -907,12 +932,11 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
               Text(
                 '${comments.length} ${comments.length == 1 ? 'Comment' : 'Comments'}',
                 style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 20.sp
-                ),
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 20.sp),
               ),
-               SizedBox(
+              SizedBox(
                 height: 5.h,
               ),
               Divider(
@@ -929,21 +953,23 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
                       child: Text(
                         "U",
                         style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600),
+                            color: Colors.white, fontWeight: FontWeight.w600),
                       ),
                     ),
-                    title: Text(comment.username,
+                    title: Text(
+                      comment.username,
                       style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    subtitle: Text(comment.text,
-                    style: GoogleFonts.poppins(
+                    subtitle: Text(
+                      comment.text,
+                      style: GoogleFonts.poppins(
                         color: Colors.grey.shade100,
                         fontWeight: FontWeight.w500,
-                    ),),
+                      ),
+                    ),
                   );
                 }).toList(),
               ),
@@ -954,5 +980,3 @@ class _ImageDetailsScreenState extends State<ImageDetailsScreen> {
     );
   }
 }
-
-

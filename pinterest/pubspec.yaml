@@ -1,4 +1,4 @@
-name: pinterest_clone
+name: flutter_firebase
 description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.1.2 <4.0.0'
+  sdk: '>=3.0.5 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -32,8 +32,6 @@ dependencies:
     sdk: flutter
 
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
@@ -50,8 +48,20 @@ dependencies:
   flutter_staggered_grid_view: ^0.7.0
   flutter_masonry_view: ^0.0.2
   badges: ^3.1.2
-
-
+  firebase_core: any
+  cloud_firestore: ^4.8.2
+  firebase_auth: ^4.6.3
+  firebase_storage: ^11.2.4
+  fluttertoast: ^8.2.2
+  font_awesome_flutter: ^10.6.0
+  google_sign_in: ^6.1.5
+  flare_flutter: ^3.0.2
+  video_player: ^2.8.2
+  native_video_view: ^1.0.5
+  file_picker: ^6.1.1
+  permission_handler: ^11.3.0
+  path_provider: ^2.1.2
+  flutter_downloader: ^1.11.6
 
 dev_dependencies:
   flutter_test:
@@ -75,10 +85,14 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - assets/videos/
 
+  # To add assets to your application, add an assets section, like this:
+  # assets:
+  #   - images/a_dot_burr.jpeg
+  #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
